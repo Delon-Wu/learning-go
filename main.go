@@ -54,8 +54,8 @@ func learnBasicType() {
 	var runes []rune = []rune(ss)
 	fmt.Println(runes, len(runes))
 
-	var s1, s2 string = "Foo", `Foo`
-	fmt.Println("s1 == s2: %d", s1 == s2)
+	//var s1, s2 string = "Foo", `Foo`
+	//fmt.Println("s1 == s2: %d", s1 == s2)
 
 	var (
 		group1 = 1
@@ -186,6 +186,41 @@ func learnPointer() {
 
 }
 
+func learnSlice() {
+	var blankSlice []int
+	//blankSlice[0] = 1 // 错误用法
+	fmt.Println(blankSlice, cap(blankSlice))
+	var blankSlice2 []int = []int{}
+	fmt.Println(blankSlice2)
+
+	slice1 := []int{1, 2, 3, 4, 5, 6, 7}
+	var slice2 []int = make([]int, 3, 5)
+	slice3 := make([]int, 3, 5)
+	fmt.Println(slice1)
+	fmt.Println(slice2)
+	fmt.Println(slice3)
+
+	var slice4 = slice1[1:]
+	var slice5 = slice1[1:3:7]
+	fmt.Println(slice4, cap(slice4))
+	fmt.Println(slice5, cap(slice5))
+	fmt.Println(slice5 == nil) // 只能和nil比较
+
+	var slice6 = []int{1, 2, 3}
+	slice6 = append(slice6, 4)
+	fmt.Println(slice6, cap(slice6))
+	slice6 = append(slice6, 5, 6, 7, 8)
+	fmt.Println(slice6, cap(slice6))
+
+	var slice7 = []int{1, 2, 3, 4, 5, 6, 7}
+	slice7 = slice7[:len(slice7)-1]
+	fmt.Println(slice7)
+	slice7 = slice7[1:]
+	fmt.Println(slice7)
+	slice7 = append(slice7[:2], slice7[2+2:]...)
+	fmt.Println(slice7)
+}
+
 func learnStruct() {
 	// go当中没有类的概念
 	// 首字母大写是公开的，小写是非公开的
@@ -256,6 +291,8 @@ func main() {
 	learnVariable()
 	fmt.Println("----------------------learnPointer---------------------")
 	learnPointer()
+	fmt.Println("----------------------learnSlice---------------------")
+	learnSlice()
 	fmt.Println("---------------------learnStruct----------------------")
 	learnStruct()
 }
