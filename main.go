@@ -280,6 +280,39 @@ func learnStruct() {
 		},
 	}
 	fmt.Println(b)
+
+	type A struct {
+		a string
+	}
+	type B struct {
+		b string
+	}
+	type C struct {
+		A
+		B
+		a string
+		b string
+	}
+	type D struct {
+		da A
+		b  B
+		c  C
+	}
+
+	a1 := A{a: "I'm A"}
+	b1 := B{b: "I'm B"}
+	c1 := C{A: a1, B: b1, a: "I'm cA", b: "I'm cB"}
+	d1 := D{da: a1, b: b1, c: c1}
+	fmt.Println(d1.da)
+
+	// * 想通过结构体方法改变结构体的属性，那就要通过传入指针来修改 *
+
+	copyA1 := a1 // 深拷贝
+	copyA1.a = "I'm copyA1"
+	fmt.Println(a1, copyA1)
+	pA1 := &a1
+	(*pA1).a = "I'm changed A1"
+	fmt.Println(a1, *pA1)
 }
 
 func learnMap() {
