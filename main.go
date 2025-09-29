@@ -350,6 +350,54 @@ func learnMap() {
 	fmt.Println(res, res2)
 }
 
+type Gender string
+
+const (
+	Male   Gender = "male"
+	Female Gender = "female"
+)
+
+func (gender *Gender) IsMale() bool {
+	return *gender == "male"
+}
+func (gender *Gender) IsFemale() bool {
+	return *gender == "female"
+}
+
+type WorkDay int
+
+const (
+	Monday  WorkDay = -3
+	Tuesday WorkDay = iota // 自动推断下面的值
+	Wednesday
+	Thursday
+	Friday
+)
+const isolateGroup int = iota
+
+func learnEnum() {
+	// 类型别名
+	type AliasInt int
+	const constA AliasInt = 1
+	const constB = AliasInt(2)
+	fmt.Println(constA, constB)
+
+	// 分组声明
+	const (
+		groupA = 1
+		groupB = 2
+		groupC = "3"
+	)
+	fmt.Println(groupA, groupB, groupC)
+
+	gender := Gender("male")
+	fmt.Println(gender)
+	fmt.Printf("gender.IsMale(): %t, gender.IsFemale(): %t", gender.IsMale(), gender.IsFemale())
+
+	const thirdDay = Wednesday
+	fmt.Println(thirdDay)
+}
+
 func main() {
 	fmt.Println("Hello World!")
 	fmt.Println("----------------------learnBasicType---------------------")
@@ -366,4 +414,6 @@ func main() {
 	learnStruct()
 	fmt.Println("---------------------learnMap----------------------")
 	learnMap()
+	fmt.Println("---------------------learnEnum----------------------")
+	learnEnum()
 }
