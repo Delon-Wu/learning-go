@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"sync"
 )
@@ -281,6 +282,41 @@ func learnStruct() {
 	fmt.Println(b)
 }
 
+func learnMap() {
+	var m1 map[string]int
+	m1 = make(map[string]int)
+	fmt.Println(m1)
+	m1["foo"] = 256
+	fmt.Println(m1)
+
+	var m2 map[string]string = map[string]string{"foo": "m1_bar"}
+	m3 := map[string]string{"foo": "m2_bar"}
+	fmt.Println(m2)
+	fmt.Println(m3)
+
+	res := make(map[string]interface{})
+	res["code"] = 200
+	res["data"] = map[string]interface{}{"foo": "res", "value": 1000000000000}
+	res["msg"] = "success"
+	fmt.Println(res)
+
+	jsonStr, errs := json.Marshal(res)
+	if errs == nil {
+		fmt.Printf("序列化之后：%s\n", jsonStr)
+	}
+
+	res2 := map[string]interface{}{}
+	errs = json.Unmarshal(jsonStr, &res2)
+	if errs != nil {
+		return
+	}
+	fmt.Println(res2)
+
+	res["code"] = 400
+	delete(res2, "code")
+	fmt.Println(res, res2)
+}
+
 func main() {
 	fmt.Println("Hello World!")
 	fmt.Println("----------------------learnBasicType---------------------")
@@ -295,4 +331,6 @@ func main() {
 	learnSlice()
 	fmt.Println("---------------------learnStruct----------------------")
 	learnStruct()
+	fmt.Println("---------------------learnMap----------------------")
+	learnMap()
 }
