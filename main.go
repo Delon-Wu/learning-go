@@ -225,7 +225,7 @@ func learnSlice() {
 func learnStruct() {
 	// go当中没有类的概念
 	// 首字母大写是公开的，小写是非公开的
-	type Persion struct {
+	type Person struct {
 		Weight, Age, Height float64
 		Name                string      `json:"name"` // 这是标签
 		Eat                 func() byte `json:"eat"`
@@ -249,7 +249,7 @@ func learnStruct() {
 		Ch                  chan string
 		once                sync.Once
 		Ptr                 *int
-		BestFriend          Persion
+		BestFriend          Person
 	}{
 		Weight: 70.1,
 		Age:    20,
