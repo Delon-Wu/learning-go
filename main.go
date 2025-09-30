@@ -560,6 +560,36 @@ func learnFun() {
 	fmt.Println("creatSign:\n", m, sign)
 }
 
+func producer(ch chan string) {
+	fmt.Println("producer start")
+	ch <- "a"
+	ch <- "b"
+	ch <- "c"
+	ch <- "d"
+	fmt.Println("producer end")
+}
+
+func readChan(ch chan string) {
+	for {
+		msg := <-ch
+		fmt.Println(msg)
+	}
+}
+
+func learnChan() {
+	fmt.Println("START")
+
+	//go func() {
+	//	fmt.Println("Hello Channel")
+	//}()
+	ch := make(chan string, 3)
+	go producer(ch)
+	go readChan(ch) // 不及时读取就会堵塞
+
+	time.Sleep(1 * time.Second)
+	fmt.Println("END")
+}
+
 func main() {
 	fmt.Println("Hello World!")
 	fmt.Println("----------------------learnBasicType---------------------")
@@ -582,4 +612,6 @@ func main() {
 	learnLoop()
 	fmt.Println("---------------------learnFun----------------------")
 	learnFun()
+	fmt.Println("---------------------learnChan----------------------")
+	learnChan()
 }
