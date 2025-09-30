@@ -1,9 +1,13 @@
 package main
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"sort"
 	"sync"
+	"time"
 )
 
 const str1 = "Hello World1"
@@ -492,6 +496,70 @@ STAGE:
 	}
 }
 
+type StructA struct {
+	Name string
+}
+
+func changeName(s *StructA, newName string) {
+	(*s).Name = newName
+}
+
+func MD5(s string) string {
+	h := md5.New()
+	h.Write([]byte(s))
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func getTimeStr() string {
+	return time.Now().Format("2006-01-02 15:04:05")
+}
+
+func getTimeInt() int64 {
+	return time.Now().Unix()
+}
+
+func creatSign(params map[string]interface{}) string {
+	var keys []string
+	var str = ""
+	for k, _ := range params {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for i := 0; i < len(keys); i++ {
+		if i == 0 {
+			str = fmt.Sprintf("%v=%v", keys[i], params[keys[i]])
+		} else {
+			str += fmt.Sprintf("&xl_%v=%v", keys[i], params[keys[i]])
+		}
+	}
+	var secret = "123123"
+	sign := MD5(MD5(str) + MD5(secret))
+	return sign
+}
+
+func learnFun() {
+	//传递参数时，go默认复制一份参数出来作为入参
+	var structA = StructA{
+		Name: "a",
+	}
+	changeName(&structA, "Tom")
+	fmt.Println(structA)
+
+	fmt.Printf("MD5(\"Hello world!\"): %s\n", MD5("Hello world!"))
+
+	fmt.Printf("Current time is: %s\n", getTimeStr())
+
+	fmt.Println(getTimeInt())
+
+	m := map[string]interface{}{
+		"userName": "Tom2025",
+		"age":      30,
+		"Password": "123456",
+	}
+	sign := creatSign(m)
+	fmt.Println("creatSign:\n", m, sign)
+}
+
 func main() {
 	fmt.Println("Hello World!")
 	fmt.Println("----------------------learnBasicType---------------------")
@@ -512,4 +580,6 @@ func main() {
 	learnEnum()
 	fmt.Println("---------------------learnLoop----------------------")
 	learnLoop()
+	fmt.Println("---------------------learnFun----------------------")
+	learnFun()
 }
