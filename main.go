@@ -398,6 +398,100 @@ func learnEnum() {
 	fmt.Println(thirdDay)
 }
 
+func learnLoop() {
+	person := [3]string{"Tom", "Jack", "Jill"}
+	fmt.Println(person)
+
+	for k, v := range person {
+		fmt.Printf("persion[%d]: %s\n", k, v)
+	}
+
+	for i := range person {
+		fmt.Printf("persion[%d]: %s\n", i, person[i])
+	}
+
+	for i := 0; i < len(person); i++ {
+		fmt.Printf("persion[%d]: %s\n", i, person[i])
+	}
+
+	for _, name := range person {
+		fmt.Println(name)
+	}
+
+	vegetables := []string{"potato", "tomato", "onion"}
+	fmt.Println(vegetables)
+	for k, v := range vegetables {
+		fmt.Printf("vegetables[%d]: %s\n", k, v)
+	}
+
+	m := map[int]string{1: "a", 2: "b", 3: "c"}
+	fmt.Println(m, len(m))
+	for k, v := range m {
+		fmt.Printf("m[%d]: %s\n", k, v)
+	}
+	m[4] = "d"
+	fmt.Println(m)
+
+	fmt.Println("遇到c就跳出循环：")
+	for _, v := range m {
+		if v == "c" {
+			break
+		}
+		fmt.Println(v)
+	}
+
+	fmt.Println("不要 a：")
+	for _, v := range m {
+		if v == "a" {
+			continue
+		}
+		fmt.Println(v)
+	}
+
+	// goto
+	for _, v := range person {
+		if v == "Jill" {
+			goto STAGE
+		}
+	}
+
+	fmt.Println("-----------嘿！看看我被跳过了吗------------")
+
+STAGE:
+	fmt.Println("Jill, 你被跳过了")
+
+	type Month int
+	const (
+		January Month = iota
+		February
+		March
+		April
+		May
+		June
+		July
+		August
+		September
+		October
+		November
+		December
+	)
+	month := October + 10
+	fmt.Printf("month: %d\n", month+1)
+	// 默认每个case都有break
+	switch month {
+	case March, April, May:
+		fmt.Println("这是春天的月份")
+	case June, July, August:
+		fmt.Println("这是夏天的月份")
+	case September, October, November:
+		fmt.Println("这是秋天的月份")
+	case January, February, December:
+		fmt.Println("这是冬天的月份")
+	default:
+		fmt.Println("没有这个月份")
+	}
+}
+
 func main() {
 	fmt.Println("Hello World!")
 	fmt.Println("----------------------learnBasicType---------------------")
@@ -416,4 +510,6 @@ func main() {
 	learnMap()
 	fmt.Println("---------------------learnEnum----------------------")
 	learnEnum()
+	fmt.Println("---------------------learnLoop----------------------")
+	learnLoop()
 }
