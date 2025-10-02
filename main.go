@@ -586,8 +586,59 @@ func learnChan() {
 	go producer(ch)
 	go readChan(ch) // 不及时读取就会堵塞
 
-	time.Sleep(1 * time.Second)
+	//time.Sleep(1 * time.Second)
 	fmt.Println("END")
+}
+
+func learnOperator() {
+	var a, b = 10, 5
+	v1 := a + b
+	v2 := a - b
+	v3 := a * b
+	v4 := a / b
+	v5 := a % b
+	fmt.Println(v1, v2, v3, v4, v5)
+
+	a++
+	fmt.Println(a)
+
+	//++a // 没有前置的自增用法
+	//fmt.Println(a)
+
+	//c := a++ + b // 不能在运算中使用
+	//c := (a++) + b // 不能在运算中使用
+	//fmt.Println(c)
+
+	//fmt.Println(a++) // 不能在运算中使用
+
+	a += 1
+	b -= 1
+	fmt.Println(a, b)
+
+	//a = 10 + 0.1 // 只能是相同数据类型进行运算
+	//fmt.Println(a)
+	f := float64(10) + 0.1
+	fmt.Println(f)
+	b1 := byte(1) + 1
+	fmt.Println(b1)
+	num := int(f)
+	fmt.Println(num) // 小数位会被强制截除掉
+
+	//运算符
+	// > < == >= <= !=
+	// 逻辑运算符：&& || !
+	// 位运算符： & | ^
+	fmt.Println(a == (-1))
+
+	num = 1
+	num <<= 1
+	fmt.Println(num)
+	num += 6 * 2
+	fmt.Println(num)
+
+	if c := 100; a < c {
+		fmt.Println("a < c", a < c, a, c)
+	}
 }
 
 func main() {
@@ -614,4 +665,6 @@ func main() {
 	learnFun()
 	fmt.Println("---------------------learnChan----------------------")
 	learnChan()
+	fmt.Println("---------------------learnOperator----------------------")
+	learnOperator()
 }
