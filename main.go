@@ -494,6 +494,16 @@ STAGE:
 	default:
 		fmt.Println("没有这个月份")
 	}
+
+	num := byte(1)
+	var d interface{}
+	d = &num
+	switch t := d.(type) {
+	case *int:
+		fmt.Printf("It's %T\n", t)
+	default:
+		fmt.Printf("It's %T\n", t)
+	}
 }
 
 type StructA struct {
