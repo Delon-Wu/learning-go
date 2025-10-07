@@ -229,7 +229,7 @@ func learnSlice() {
 func learnStruct() {
 	// go当中没有类的概念
 	// 首字母大写是公开的，小写是非公开的
-	type Persion struct {
+	type Person struct {
 		Weight, Age, Height float64
 		Name                string      `json:"name"` // 这是标签
 		Eat                 func() byte `json:"eat"`
@@ -253,7 +253,7 @@ func learnStruct() {
 		Ch                  chan string
 		once                sync.Once
 		Ptr                 *int
-		BestFriend          Persion
+		BestFriend          Person
 	}{
 		Weight: 70.1,
 		Age:    20,
@@ -416,15 +416,15 @@ func learnLoop() {
 	}
 
 	for k, v := range person {
-		fmt.Printf("persion[%d]: %s\n", k, v)
+		fmt.Printf("Person[%d]: %s\n", k, v)
 	}
 
 	for i := range person {
-		fmt.Printf("persion[%d]: %s\n", i, person[i])
+		fmt.Printf("Person[%d]: %s\n", i, person[i])
 	}
 
 	for i := 0; i < len(person); i++ {
-		fmt.Printf("persion[%d]: %s\n", i, person[i])
+		fmt.Printf("Person[%d]: %s\n", i, person[i])
 	}
 
 	for _, name := range person {
@@ -577,6 +577,14 @@ func creatSign(params map[string]interface{}) string {
 	return sign
 }
 
+type StructB struct {
+	b string
+}
+
+func (b *StructB) change(str string) {
+	b.b = str
+}
+
 func learnFun() {
 	//传递参数时，go默认复制一份参数出来作为入参
 	var structA = StructA{
@@ -598,6 +606,23 @@ func learnFun() {
 	}
 	sign := creatSign(m)
 	fmt.Println("creatSign:\n", m, sign)
+
+	//闭包
+	sb := StructB{
+		b: "default",
+	}
+	functionChange := sb.change
+	returnFunc := func() func(int, string) (int, string) {
+		fmt.Println("我是一个匿名函数")
+		return func(n int, s string) (int, string) {
+			return n, s
+		}
+	}()
+	fmt.Println(sb)
+	functionChange("Changed sb")
+	fmt.Printf("执行functiohnChange之后的 sb.b: %s\n", sb.b)
+	res1, res2 := returnFunc(10, "Hello world")
+	fmt.Println(res1, res2)
 }
 
 func producer(ch chan string) {
