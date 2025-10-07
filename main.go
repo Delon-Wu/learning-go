@@ -209,18 +209,23 @@ func learnSlice() {
 	var blankSlice2 []int = []int{}
 	fmt.Println(blankSlice2)
 
-	slice1 := []int{1, 2, 3, 4, 5, 6, 7}
+	arr := [...]int{1, 2, 3, 4, 5, 6, 7}
 	var slice2 []int = make([]int, 3, 5)
 	slice3 := make([]int, 3, 5)
-	fmt.Println(slice1)
+	fmt.Println(arr)
 	fmt.Println(slice2)
 	fmt.Println(slice3)
 
-	var slice4 = slice1[1:]
-	var slice5 = slice1[1:3:7]
+	var slice4 = arr[1:]
+	var slice5 = arr[1:3:7]
 	fmt.Println(slice4, cap(slice4))
 	fmt.Println(slice5, cap(slice5))
 	fmt.Println(slice5 == nil) // 只能和nil比较
+
+	fmt.Println("arr: ", arr)
+	arr[4] = 99
+	fmt.Println("slice4: ", slice4) // 同样被改为99，
+	// 所以，切片的元素是数组元素的一个引用，切片实际上是特殊的数组
 
 	var slice6 = []int{1, 2, 3}
 	slice6 = append(slice6, 4)
@@ -235,6 +240,32 @@ func learnSlice() {
 	fmt.Println(slice7)
 	slice7 = append(slice7[:2], slice7[2+2:]...)
 	fmt.Println(slice7)
+
+	//复制
+	src := []int{1, 2, 3, 4, 5, 6, 7}
+	dst := make([]int, 3, 6)
+	fmt.Println("before copy, src, dst = ", src, dst)
+	copy(dst, src)
+	fmt.Println("after copy, src, dst = ", src, dst)
+	src1 := []int{1, 2}
+	dst1 := make([]int, 3, 6)
+	fmt.Println("before copy, src1, dst1 = ", src1, dst1)
+	copy(dst1, src1)
+	fmt.Println("after copy, src1, dst1 = ", src1, dst1)
+
+	slice8 := make([]int, 3, 6)
+	slice9 := append(slice8, 4, 2)
+	fmt.Println("---------\n", slice8, len(slice8), cap(slice8))
+	fmt.Println("---------\n", slice9, len(slice9), cap(slice9))
+	slice8[1] = 1
+	slice9[1] = 2
+	fmt.Println(slice8)
+	fmt.Println(slice9)
+	// slice9在函数调用中作为参数使用也一样会修改引用指向的值
+	slice10 := append(slice9, 6, 6, 6)
+	fmt.Println(slice10)
+	slice10[1] = -1 // 扩容后会将元素复制到一个新的切片当中，就不会再影响原来的切片
+	fmt.Println(slice7, slice8, slice9, slice10)
 }
 
 func learnStruct() {
@@ -719,28 +750,28 @@ func learnOperator() {
 
 func main() {
 	fmt.Println("Hello World!")
-	fmt.Println("----------------------learnBasicType---------------------")
-	learnBasicType()
-	fmt.Println("----------------------learnArray---------------------")
-	learnArray()
-	fmt.Println("----------------------learnVariable---------------------")
-	learnVariable()
-	fmt.Println("----------------------learnPointer---------------------")
-	learnPointer()
+	//fmt.Println("----------------------learnBasicType---------------------")
+	//learnBasicType()
+	//fmt.Println("----------------------learnArray---------------------")
+	//learnArray()
+	//fmt.Println("----------------------learnVariable---------------------")
+	//learnVariable()
+	//fmt.Println("----------------------learnPointer---------------------")
+	//learnPointer()
 	fmt.Println("----------------------learnSlice---------------------")
 	learnSlice()
-	fmt.Println("---------------------learnStruct----------------------")
-	learnStruct()
-	fmt.Println("---------------------learnMap----------------------")
-	learnMap()
-	fmt.Println("---------------------learnEnum----------------------")
-	learnEnum()
-	fmt.Println("---------------------learnLoop----------------------")
-	learnLoop()
-	fmt.Println("---------------------learnFun----------------------")
-	learnFun()
-	fmt.Println("---------------------learnChan----------------------")
-	learnChan()
-	fmt.Println("---------------------learnOperator----------------------")
-	learnOperator()
+	//fmt.Println("---------------------learnStruct----------------------")
+	//learnStruct()
+	//fmt.Println("---------------------learnMap----------------------")
+	//learnMap()
+	//fmt.Println("---------------------learnEnum----------------------")
+	//learnEnum()
+	//fmt.Println("---------------------learnLoop----------------------")
+	//learnLoop()
+	//fmt.Println("---------------------learnFun----------------------")
+	//learnFun()
+	//fmt.Println("---------------------learnChan----------------------")
+	//learnChan()
+	//fmt.Println("---------------------learnOperator----------------------")
+	//learnOperator()
 }
