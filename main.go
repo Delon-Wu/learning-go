@@ -406,6 +406,15 @@ func learnLoop() {
 	person := [3]string{"Tom", "Jack", "Jill"}
 	fmt.Println(person)
 
+	i := 10
+	for {
+		if i == 0 {
+			break
+		}
+		i--
+		fmt.Println(i)
+	}
+
 	for k, v := range person {
 		fmt.Printf("persion[%d]: %s\n", k, v)
 	}
@@ -455,7 +464,7 @@ func learnLoop() {
 	// goto
 	for _, v := range person {
 		if v == "Jill" {
-			goto STAGE
+			goto STAGE // 不建议使用goto，代码会变得难以维护
 		}
 	}
 
@@ -503,6 +512,27 @@ STAGE:
 		fmt.Printf("It's %T\n", t)
 	default:
 		fmt.Printf("It's %T\n", t)
+	}
+
+	for i := 0; i < 10; i++ {
+		fmt.Printf("i = %d\n", i)
+		for j := 5; j > 0; j-- {
+			fmt.Printf("j = %d\n", j)
+			if j == 3 {
+				break // 只退出最近的for循环
+			}
+		}
+	}
+	fmt.Println("---------------")
+outer:
+	for i := 0; i < 10; i++ {
+		fmt.Printf("i = %d\n", i)
+		for j := 5; j > 0; j-- {
+			fmt.Printf("j = %d\n", j)
+			if j == 3 {
+				break outer // 退出到指定位置
+			}
+		}
 	}
 }
 
