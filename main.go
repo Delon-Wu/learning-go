@@ -121,6 +121,17 @@ func learnArray() {
 	var arr9 [3][5]uint8
 	//arr9 = arr8
 	fmt.Println(arr9)
+
+	var arr10 = [...]int{1, 2, 3, 4, 5}
+	fmt.Println(arr10)
+
+	// 三维数组，遍历多维数组时，有x维就嵌套x层遍历
+	arr11 := [3][2][2]int{
+		{{1, 2}, {3, 4}},
+		{{5, 2}, {6, 4}},
+	}
+	fmt.Println(arr11, "arr11[0][1][1]: ", arr11[0][1][1])
+
 }
 
 func method1() {
