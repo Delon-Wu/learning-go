@@ -1,9 +1,13 @@
 package main
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"sort"
 	"sync"
+	"time"
 )
 
 const str1 = "Hello World1"
@@ -117,6 +121,17 @@ func learnArray() {
 	var arr9 [3][5]uint8
 	//arr9 = arr8
 	fmt.Println(arr9)
+
+	var arr10 = [...]int{1, 2, 3, 4, 5}
+	fmt.Println(arr10)
+
+	// 三维数组，遍历多维数组时，有x维就嵌套x层遍历
+	arr11 := [3][2][2]int{
+		{{1, 2}, {3, 4}},
+		{{5, 2}, {6, 4}},
+	}
+	fmt.Println(arr11, "arr11[0][1][1]: ", arr11[0][1][1])
+
 }
 
 func method1() {
@@ -194,18 +209,23 @@ func learnSlice() {
 	var blankSlice2 []int = []int{}
 	fmt.Println(blankSlice2)
 
-	slice1 := []int{1, 2, 3, 4, 5, 6, 7}
+	arr := [...]int{1, 2, 3, 4, 5, 6, 7}
 	var slice2 []int = make([]int, 3, 5)
 	slice3 := make([]int, 3, 5)
-	fmt.Println(slice1)
+	fmt.Println(arr)
 	fmt.Println(slice2)
 	fmt.Println(slice3)
 
-	var slice4 = slice1[1:]
-	var slice5 = slice1[1:3:7]
+	var slice4 = arr[1:]
+	var slice5 = arr[1:3:7]
 	fmt.Println(slice4, cap(slice4))
 	fmt.Println(slice5, cap(slice5))
 	fmt.Println(slice5 == nil) // 只能和nil比较
+
+	fmt.Println("arr: ", arr)
+	arr[4] = 99
+	fmt.Println("slice4: ", slice4) // 同样被改为99，
+	// 所以，切片的元素是数组元素的一个引用，切片实际上是特殊的数组
 
 	var slice6 = []int{1, 2, 3}
 	slice6 = append(slice6, 4)
@@ -220,6 +240,32 @@ func learnSlice() {
 	fmt.Println(slice7)
 	slice7 = append(slice7[:2], slice7[2+2:]...)
 	fmt.Println(slice7)
+
+	//复制
+	src := []int{1, 2, 3, 4, 5, 6, 7}
+	dst := make([]int, 3, 6)
+	fmt.Println("before copy, src, dst = ", src, dst)
+	copy(dst, src)
+	fmt.Println("after copy, src, dst = ", src, dst)
+	src1 := []int{1, 2}
+	dst1 := make([]int, 3, 6)
+	fmt.Println("before copy, src1, dst1 = ", src1, dst1)
+	copy(dst1, src1)
+	fmt.Println("after copy, src1, dst1 = ", src1, dst1)
+
+	slice8 := make([]int, 3, 6)
+	slice9 := append(slice8, 4, 2)
+	fmt.Println("---------\n", slice8, len(slice8), cap(slice8))
+	fmt.Println("---------\n", slice9, len(slice9), cap(slice9))
+	slice8[1] = 1
+	slice9[1] = 2
+	fmt.Println(slice8)
+	fmt.Println(slice9)
+	// slice9在函数调用中作为参数使用也一样会修改引用指向的值
+	slice10 := append(slice9, 6, 6, 6)
+	fmt.Println(slice10)
+	slice10[1] = -1 // 扩容后会将元素复制到一个新的切片当中，就不会再影响原来的切片
+	fmt.Println(slice7, slice8, slice9, slice10)
 }
 
 func learnStruct() {
@@ -398,22 +444,334 @@ func learnEnum() {
 	fmt.Println(thirdDay)
 }
 
+func learnLoop() {
+	person := [3]string{"Tom", "Jack", "Jill"}
+	fmt.Println(person)
+
+	i := 10
+	for {
+		if i == 0 {
+			break
+		}
+		i--
+		fmt.Println(i)
+	}
+
+	for k, v := range person {
+		fmt.Printf("Person[%d]: %s\n", k, v)
+	}
+
+	for i := range person {
+		fmt.Printf("Person[%d]: %s\n", i, person[i])
+	}
+
+	for i := 0; i < len(person); i++ {
+		fmt.Printf("Person[%d]: %s\n", i, person[i])
+	}
+
+	for _, name := range person {
+		fmt.Println(name)
+	}
+
+	vegetables := []string{"potato", "tomato", "onion"}
+	fmt.Println(vegetables)
+	for k, v := range vegetables {
+		fmt.Printf("vegetables[%d]: %s\n", k, v)
+	}
+
+	m := map[int]string{1: "a", 2: "b", 3: "c"}
+	fmt.Println(m, len(m))
+	for k, v := range m {
+		fmt.Printf("m[%d]: %s\n", k, v)
+	}
+	m[4] = "d"
+	fmt.Println(m)
+
+	fmt.Println("遇到c就跳出循环：")
+	for _, v := range m {
+		if v == "c" {
+			break
+		}
+		fmt.Println(v)
+	}
+
+	fmt.Println("不要 a：")
+	for _, v := range m {
+		if v == "a" {
+			continue
+		}
+		fmt.Println(v)
+	}
+
+	// goto
+	for _, v := range person {
+		if v == "Jill" {
+			goto STAGE // 不建议使用goto，代码会变得难以维护
+		}
+	}
+
+	fmt.Println("-----------嘿！看看我被跳过了吗------------")
+
+STAGE:
+	fmt.Println("Jill, 你被跳过了")
+
+	type Month int
+	const (
+		January Month = iota
+		February
+		March
+		April
+		May
+		June
+		July
+		August
+		September
+		October
+		November
+		December
+	)
+	month := October + 10
+	fmt.Printf("month: %d\n", month+1)
+	// 默认每个case都有break
+	switch month {
+	case March, April, May:
+		fmt.Println("这是春天的月份")
+	case June, July, August:
+		fmt.Println("这是夏天的月份")
+	case September, October, November:
+		fmt.Println("这是秋天的月份")
+	case January, February, December:
+		fmt.Println("这是冬天的月份")
+	default:
+		fmt.Println("没有这个月份")
+	}
+
+	num := byte(1)
+	var d interface{}
+	d = &num
+	switch t := d.(type) {
+	case *int:
+		fmt.Printf("It's %T\n", t)
+	default:
+		fmt.Printf("It's %T\n", t)
+	}
+
+	for i := 0; i < 10; i++ {
+		fmt.Printf("i = %d\n", i)
+		for j := 5; j > 0; j-- {
+			fmt.Printf("j = %d\n", j)
+			if j == 3 {
+				break // 只退出最近的for循环
+			}
+		}
+	}
+	fmt.Println("---------------")
+outer:
+	for i := 0; i < 10; i++ {
+		fmt.Printf("i = %d\n", i)
+		for j := 5; j > 0; j-- {
+			fmt.Printf("j = %d\n", j)
+			if j == 3 {
+				break outer // 退出到指定位置
+			}
+		}
+	}
+}
+
+type StructA struct {
+	Name string
+}
+
+func changeName(s *StructA, newName string) {
+	(*s).Name = newName
+}
+
+func MD5(s string) string {
+	h := md5.New()
+	h.Write([]byte(s))
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func getTimeStr() string {
+	return time.Now().Format("2006-01-02 15:04:05")
+}
+
+func getTimeInt() int64 {
+	return time.Now().Unix()
+}
+
+func creatSign(params map[string]interface{}) string {
+	var keys []string
+	var str = ""
+	for k, _ := range params {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for i := 0; i < len(keys); i++ {
+		if i == 0 {
+			str = fmt.Sprintf("%v=%v", keys[i], params[keys[i]])
+		} else {
+			str += fmt.Sprintf("&xl_%v=%v", keys[i], params[keys[i]])
+		}
+	}
+	var secret = "123123"
+	sign := MD5(MD5(str) + MD5(secret))
+	return sign
+}
+
+type StructB struct {
+	b string
+}
+
+func (b *StructB) change(str string) {
+	b.b = str
+}
+
+func learnFun() {
+	//传递参数时，go默认复制一份参数出来作为入参
+	var structA = StructA{
+		Name: "a",
+	}
+	changeName(&structA, "Tom")
+	fmt.Println(structA)
+
+	fmt.Printf("MD5(\"Hello world!\"): %s\n", MD5("Hello world!"))
+
+	fmt.Printf("Current time is: %s\n", getTimeStr())
+
+	fmt.Println(getTimeInt())
+
+	m := map[string]interface{}{
+		"userName": "Tom2025",
+		"age":      30,
+		"Password": "123456",
+	}
+	sign := creatSign(m)
+	fmt.Println("creatSign:\n", m, sign)
+
+	//闭包
+	sb := StructB{
+		b: "default",
+	}
+	functionChange := sb.change
+	returnFunc := func() func(int, string) (int, string) {
+		fmt.Println("我是一个匿名函数")
+		return func(n int, s string) (int, string) {
+			return n, s
+		}
+	}()
+	fmt.Println(sb)
+	functionChange("Changed sb")
+	fmt.Printf("执行functiohnChange之后的 sb.b: %s\n", sb.b)
+	res1, res2 := returnFunc(10, "Hello world")
+	fmt.Println(res1, res2)
+}
+
+func producer(ch chan string) {
+	fmt.Println("producer start")
+	ch <- "a"
+	ch <- "b"
+	ch <- "c"
+	ch <- "d"
+	fmt.Println("producer end")
+}
+
+func readChan(ch chan string) {
+	for {
+		msg := <-ch
+		fmt.Println(msg)
+	}
+}
+
+func learnChan() {
+	fmt.Println("START")
+
+	//go func() {
+	//	fmt.Println("Hello Channel")
+	//}()
+	ch := make(chan string, 3)
+	go producer(ch)
+	go readChan(ch) // 不及时读取就会堵塞
+
+	//time.Sleep(1 * time.Second)
+	fmt.Println("END")
+}
+
+func learnOperator() {
+	var a, b = 10, 5
+	v1 := a + b
+	v2 := a - b
+	v3 := a * b
+	v4 := a / b
+	v5 := a % b
+	fmt.Println(v1, v2, v3, v4, v5)
+
+	a++
+	fmt.Println(a)
+
+	//++a // 没有前置的自增用法
+	//fmt.Println(a)
+
+	//c := a++ + b // 不能在运算中使用
+	//c := (a++) + b // 不能在运算中使用
+	//fmt.Println(c)
+
+	//fmt.Println(a++) // 不能在运算中使用
+
+	a += 1
+	b -= 1
+	fmt.Println(a, b)
+
+	//a = 10 + 0.1 // 只能是相同数据类型进行运算
+	//fmt.Println(a)
+	f := float64(10) + 0.1
+	fmt.Println(f)
+	b1 := byte(1) + 1
+	fmt.Println(b1)
+	num := int(f)
+	fmt.Println(num) // 小数位会被强制截除掉
+
+	//运算符
+	// > < == >= <= !=
+	// 逻辑运算符：&& || !
+	// 位运算符： & | ^
+	fmt.Println(a == (-1))
+
+	num = 1
+	num <<= 1
+	fmt.Println(num)
+	num += 6 * 2
+	fmt.Println(num)
+
+	if c := 100; a < c {
+		fmt.Println("a < c", a < c, a, c)
+	}
+}
+
 func main() {
 	fmt.Println("Hello World!")
-	fmt.Println("----------------------learnBasicType---------------------")
-	learnBasicType()
-	fmt.Println("----------------------learnArray---------------------")
-	learnArray()
-	fmt.Println("----------------------learnVariable---------------------")
-	learnVariable()
-	fmt.Println("----------------------learnPointer---------------------")
-	learnPointer()
+	//fmt.Println("----------------------learnBasicType---------------------")
+	//learnBasicType()
+	//fmt.Println("----------------------learnArray---------------------")
+	//learnArray()
+	//fmt.Println("----------------------learnVariable---------------------")
+	//learnVariable()
+	//fmt.Println("----------------------learnPointer---------------------")
+	//learnPointer()
 	fmt.Println("----------------------learnSlice---------------------")
 	learnSlice()
-	fmt.Println("---------------------learnStruct----------------------")
-	learnStruct()
-	fmt.Println("---------------------learnMap----------------------")
-	learnMap()
-	fmt.Println("---------------------learnEnum----------------------")
-	learnEnum()
+	//fmt.Println("---------------------learnStruct----------------------")
+	//learnStruct()
+	//fmt.Println("---------------------learnMap----------------------")
+	//learnMap()
+	//fmt.Println("---------------------learnEnum----------------------")
+	//learnEnum()
+	//fmt.Println("---------------------learnLoop----------------------")
+	//learnLoop()
+	//fmt.Println("---------------------learnFun----------------------")
+	//learnFun()
+	//fmt.Println("---------------------learnChan----------------------")
+	//learnChan()
+	//fmt.Println("---------------------learnOperator----------------------")
+	//learnOperator()
 }
