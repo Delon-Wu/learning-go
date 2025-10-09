@@ -368,7 +368,10 @@ func learnMap() {
 	m1["foo"] = 256
 	fmt.Println(m1)
 
-	var m2 map[string]string = map[string]string{"foo": "m1_bar"}
+	noneExitValue, exists := m1["foo1"]
+	fmt.Println(exists, noneExitValue)
+
+	var m2 = map[string]string{"foo": "m1_bar"}
 	m3 := map[string]string{"foo": "m2_bar"}
 	fmt.Println(m2)
 	fmt.Println(m3)
@@ -392,6 +395,8 @@ func learnMap() {
 	fmt.Println(res2)
 
 	res["code"] = 400
+	res2["newFoo"] = "new foo"
+	fmt.Println(res, res2, len(res), len(res2))
 	delete(res2, "code")
 	fmt.Println(res, res2)
 }
@@ -748,6 +753,53 @@ func learnOperator() {
 	}
 }
 
+func addDataInChan(ch chan int) {
+	size := cap(ch)
+	for i := 0; i < size; i++ {
+		ch <- i
+		time.Sleep(time.Second * 1)
+	}
+	close(ch) // 如果不关闭通道，程序进入asleep状态， 相当于死锁
+}
+
+func learnRange() {
+	str1 := "abc一二三"
+	for index := range str1 {
+		fmt.Println(index, str1[index], string(str1[index]))
+	}
+	fmt.Println("length: ", len(str1))
+
+	arr := [...]int{0, 1, 2, 3}
+	slice := []int{0, 1}
+	for i, v := range arr {
+		fmt.Println(i, v)
+	}
+	for i, v := range slice {
+		fmt.Println(i, v)
+	}
+	slice = append(slice, 2, 3, 4)
+	fmt.Println("After append:", len(slice), cap(slice))
+	for i, v := range slice {
+		fmt.Println(i, v)
+	}
+
+	hashMap := map[string]int{
+		"abandon": 1,
+		"banana":  2,
+		"cherry":  3,
+	}
+	for k, v := range hashMap {
+		fmt.Println(k, v)
+	}
+
+	//遍历通道
+	ch := make(chan int, 10)
+	go addDataInChan(ch)
+	for v := range ch {
+		fmt.Println(v)
+	}
+}
+
 func main() {
 	fmt.Println("Hello World!")
 	//fmt.Println("----------------------learnBasicType---------------------")
@@ -762,8 +814,8 @@ func main() {
 	learnSlice()
 	//fmt.Println("---------------------learnStruct----------------------")
 	//learnStruct()
-	//fmt.Println("---------------------learnMap----------------------")
-	//learnMap()
+	fmt.Println("---------------------learnMap----------------------")
+	learnMap()
 	//fmt.Println("---------------------learnEnum----------------------")
 	//learnEnum()
 	//fmt.Println("---------------------learnLoop----------------------")
@@ -774,4 +826,6 @@ func main() {
 	//learnChan()
 	//fmt.Println("---------------------learnOperator----------------------")
 	//learnOperator()
+	fmt.Println("---------------------learnRange----------------------")
+	learnRange()
 }
