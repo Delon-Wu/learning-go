@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -793,10 +794,102 @@ func learnRange() {
 	}
 
 	//遍历通道
-	ch := make(chan int, 10)
-	go addDataInChan(ch)
-	for v := range ch {
-		fmt.Println(v)
+	//ch := make(chan int, 10)
+	//go addDataInChan(ch)
+	//for v := range ch {
+	//	fmt.Println(v)
+	//}
+}
+
+type Supplier interface {
+	Get() string
+}
+
+type DigitSupplier struct {
+	value int
+}
+
+func (d *DigitSupplier) Get() string {
+	return fmt.Sprintf("%d", d.value)
+}
+
+func learnTypeChanging() {
+	var i int32 = 17
+	var b byte = 5
+	var f float32
+	f = float32(i) / float32(b)
+	fmt.Println(f)
+
+	var i2 int32 = 256
+	fmt.Println("i2:", i2)
+	var b2 = byte(i2)
+	fmt.Println(b2)
+
+	str := "abc, 123, 世界，你好"
+	bytes := []byte(str)
+	runes := []rune(str)
+	fmt.Println(bytes)
+	fmt.Println(runes)
+
+	s1 := string(bytes)
+	s2 := string(runes)
+	fmt.Println(s1, s2)
+
+	// 字符串转数字
+	numStr := "123" // "123a"
+	num, err := strconv.Atoi(numStr)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(num)
+
+	numStr1 := strconv.Itoa(666)
+	fmt.Println(numStr1)
+
+	uin32, err := strconv.ParseUint(numStr, 10, 32)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(uin32)
+	numStr = "123a"
+	i32, err := strconv.ParseInt(numStr, 16, 32)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(i32)
+
+	//数字转字符串
+	numStr2 := strconv.FormatUint(0o127, 8)
+	numStr3 := strconv.FormatInt(-1212, 2)
+	fmt.Println(numStr2, numStr3)
+	numStr4 := fmt.Sprintf("%d", int32(999))
+	fmt.Println(numStr4)
+
+	// 接口转换
+	var interface1 interface{} = int32(3)
+	a, ok := interface1.(int32) // int
+	if ok {
+		fmt.Println(a)
+	} else {
+		fmt.Println("转换失败")
+	}
+
+	switch t := interface1.(type) {
+	case int:
+		fmt.Println("The type is int", t)
+	case string:
+		fmt.Println("The type is string", t)
+	case int32:
+		fmt.Println("The type is int32", t)
+	}
+
+	// 结构体和接口互转
+	var supplierA Supplier = &DigitSupplier{value: 9}
+	fmt.Println(supplierA.Get())
+
+	b111, ok := (supplierA).(*DigitSupplier)
+	if ok {
+		fmt.Println(b111.Get())
 	}
 }
 
@@ -828,4 +921,6 @@ func main() {
 	//learnOperator()
 	fmt.Println("---------------------learnRange----------------------")
 	learnRange()
+	fmt.Println("---------------------learnTypeChanging----------------------")
+	learnTypeChanging()
 }
