@@ -893,6 +893,89 @@ func learnTypeChanging() {
 	}
 }
 
+type PayMethod interface {
+	Account              // 接口允许嵌套
+	Pay(amount int) bool // 接口方法不一定要公开（首字母大写），参数名也不一定要有，要有参数的数据类型
+}
+
+type Account interface {
+	GetBalance() int
+}
+
+type emptyInterface interface{}
+
+type CreditCard struct {
+	balance int
+	limit   int
+}
+
+func (c *CreditCard) GetBalance() int {
+	return c.balance
+}
+
+func (c *CreditCard) Pay(amount int) bool {
+	if amount > c.limit {
+		fmt.Println("信用卡支付失败，超出额度")
+		return false
+	}
+
+	c.balance += amount
+	fmt.Println("信用卡支付成功：", amount)
+	return true
+}
+
+type DebitCard struct {
+	balance int
+}
+
+func (d *DebitCard) GetBalance() int {
+	return d.balance
+}
+
+func (d *DebitCard) Pay(amount int) bool {
+	if amount > d.balance {
+		fmt.Println("借记卡余额不足，支付失败：", d.balance)
+		return false
+	}
+	d.balance -= amount
+	return true
+}
+
+func purchaseItem(p PayMethod, price int) {
+	if p.Pay(price) {
+		fmt.Println("购买成功，剩余余额：", p.GetBalance())
+	} else {
+		fmt.Println("购买失败")
+	}
+}
+
+func learnInterface() {
+	creditCard := &CreditCard{balance: 0, limit: 1000}
+	debitCard := &DebitCard{balance: 1000}
+
+	fmt.Println("使用信用卡购买")
+	purchaseItem(creditCard, 1000)
+
+	fmt.Println("使用借记卡购买")
+	purchaseItem(debitCard, 800)
+
+	fmt.Println("使用借记卡购买")
+	purchaseItem(debitCard, 800)
+
+	var account Account = creditCard
+	fmt.Println("获取账户余额：", account.GetBalance())
+
+	var a emptyInterface
+	var b = 1
+	a = debitCard
+	a = 1
+	a = 1.4
+	a = true
+	a = &b
+	a = "Hello world"
+	fmt.Println(a)
+}
+
 func main() {
 	fmt.Println("Hello World!")
 	//fmt.Println("----------------------learnBasicType---------------------")
@@ -923,4 +1006,6 @@ func main() {
 	learnRange()
 	fmt.Println("---------------------learnTypeChanging----------------------")
 	learnTypeChanging()
+	fmt.Println("---------------------learnInterface----------------------")
+	learnInterface()
 }
