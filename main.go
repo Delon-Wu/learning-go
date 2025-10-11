@@ -689,18 +689,55 @@ func readChan(ch chan string) {
 	}
 }
 
+func sendOnly(ch chan<- int) {
+	for i := 0; i < 5; i++ {
+		fmt.Println("发送前：", i)
+		// 如果缓冲区满了，会阻塞在这一步
+		ch <- i
+		fmt.Println("发送后：", i)
+	}
+	close(ch) // 关闭之后不回再阻塞
+}
+
+func receiveOnly(ch <-chan int) {
+	for v := range ch {
+		fmt.Println("接收到：", v)
+	}
+}
+
 func learnChan() {
 	fmt.Println("START")
 
 	//go func() {
 	//	fmt.Println("Hello Channel")
 	//}()
-	ch := make(chan string, 3)
-	go producer(ch)
-	go readChan(ch) // 不及时读取就会堵塞
 
-	//time.Sleep(1 * time.Second)
-	fmt.Println("END")
+	//ch := make(chan string, 3)
+	//go producer(ch)
+	//go readChan(ch) // 不及时读取就会堵塞
+
+	ch := make(chan int, 3)
+	go sendOnly(ch)
+	//go receiveOnly(ch)
+
+	timeout := time.After(2 * time.Second)
+	for {
+		select {
+		case v, ok := <-ch:
+			if !ok { // 通道是什么类型，关闭后ok就是什么类型的零值
+				fmt.Println("Channel已经关闭")
+				return
+			}
+			fmt.Printf("主goroutine接收到：%d\n", v)
+			time.Sleep(500 * time.Millisecond)
+		case <-timeout:
+			fmt.Println("操作超时")
+			return
+		default:
+			fmt.Println("没有数据，等待中...")
+			time.Sleep(100 * time.Millisecond)
+		}
+	}
 }
 
 func learnOperator() {
@@ -976,6 +1013,64 @@ func learnInterface() {
 	fmt.Println(a)
 }
 
+func repeatSaySomething(s string) {
+	for i := 0; i < 3; i++ {
+		time.Sleep(time.Millisecond * 100)
+		fmt.Println(s)
+	}
+}
+
+type SaveCounter struct {
+	mu    sync.Mutex
+	count int
+}
+type UnsaveCounter struct {
+	count int
+}
+
+func (s *SaveCounter) increment() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.count++
+}
+
+func (s *SaveCounter) GetCount() int {
+	return s.count
+}
+
+func (c *UnsaveCounter) increment() {
+	c.count++
+}
+func (c *UnsaveCounter) GetCount() int {
+	return c.count
+}
+
+func learnConcurrency() {
+	go func() {
+		fmt.Println("goroutine in closure")
+	}()
+
+	go func(s string) {
+		fmt.Println(s)
+	}("goroutine paragram")
+
+	go repeatSaySomething("hello goroutine")
+
+	//counter := SaveCounter{}
+	unsaveCounter := UnsaveCounter{}
+	for i := 0; i < 1000; i++ {
+		go func() {
+			for j := 0; j < 100; j++ {
+				//counter.increment()
+				unsaveCounter.increment()
+			}
+		}()
+	}
+	time.Sleep(time.Second * 2)
+	fmt.Println("Final count: ", unsaveCounter.GetCount())
+	fmt.Println("learn goroutine")
+}
+
 func main() {
 	fmt.Println("Hello World!")
 	//fmt.Println("----------------------learnBasicType---------------------")
@@ -998,8 +1093,8 @@ func main() {
 	//learnLoop()
 	//fmt.Println("---------------------learnFun----------------------")
 	//learnFun()
-	//fmt.Println("---------------------learnChan----------------------")
-	//learnChan()
+	fmt.Println("---------------------learnChan----------------------")
+	learnChan()
 	//fmt.Println("---------------------learnOperator----------------------")
 	//learnOperator()
 	fmt.Println("---------------------learnRange----------------------")
@@ -1008,4 +1103,6 @@ func main() {
 	learnTypeChanging()
 	fmt.Println("---------------------learnInterface----------------------")
 	learnInterface()
+	fmt.Println("---------------------learnConcurrency----------------------")
+	learnConcurrency()
 }
