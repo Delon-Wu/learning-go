@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
@@ -1071,6 +1072,36 @@ func learnConcurrency() {
 	fmt.Println("learn goroutine")
 }
 
+func learnSelect() {
+	ch1 := make(chan int, 10)
+	ch2 := make(chan int, 10)
+	ch3 := make(chan int, 10)
+	go func() {
+		for i := 0; i < 5; i++ {
+			ch1 <- i
+			ch2 <- i
+			ch3 <- i
+		}
+	}()
+
+	ctx, _ := context.WithTimeout(context.Background(), time.Second*2)
+	for i := 0; i < 5; i++ {
+		select { // 可见，选择哪个分支是随机的
+		case value := <-ch1:
+			fmt.Printf("receive %d from ch1\n", value)
+		case value := <-ch2:
+			fmt.Printf("receive %d from ch2\n", value)
+		case value := <-ch3:
+			fmt.Printf("receive %d from ch3\n", value)
+		case <-ctx.Done():
+			fmt.Println("Context done")
+			return
+		}
+		fmt.Println("select end")
+
+	}
+}
+
 func main() {
 	fmt.Println("Hello World!")
 	//fmt.Println("----------------------learnBasicType---------------------")
@@ -1105,4 +1136,6 @@ func main() {
 	learnInterface()
 	fmt.Println("---------------------learnConcurrency----------------------")
 	learnConcurrency()
+	fmt.Println("---------------------learnSelect----------------------")
+	learnSelect()
 }
