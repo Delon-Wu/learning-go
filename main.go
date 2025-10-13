@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/Delon-Wu/learning-go.git/packing"
 )
 
 const str1 = "Hello World1"
@@ -1138,4 +1140,7 @@ func main() {
 	learnConcurrency()
 	fmt.Println("---------------------learnSelect----------------------")
 	learnSelect()
+	fmt.Println("---------------------learnPacking----------------------")
+	// 文件后带darwin，linux，windows关键字会被自动条件编译
+	fmt.Println(packing.TAG)
 }
