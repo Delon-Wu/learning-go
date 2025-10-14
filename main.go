@@ -12,6 +12,8 @@ import (
 	"time"
 
 	"github.com/Delon-Wu/learning-go.git/packing"
+
+	"github.com/Delon-Wu/learning-go.git/task"
 )
 
 const str1 = "Hello World1"
@@ -692,55 +694,18 @@ func readChan(ch chan string) {
 	}
 }
 
-func sendOnly(ch chan<- int) {
-	for i := 0; i < 5; i++ {
-		fmt.Println("发送前：", i)
-		// 如果缓冲区满了，会阻塞在这一步
-		ch <- i
-		fmt.Println("发送后：", i)
-	}
-	close(ch) // 关闭之后不回再阻塞
-}
-
-func receiveOnly(ch <-chan int) {
-	for v := range ch {
-		fmt.Println("接收到：", v)
-	}
-}
-
 func learnChan() {
 	fmt.Println("START")
 
 	//go func() {
 	//	fmt.Println("Hello Channel")
 	//}()
+	ch := make(chan string, 3)
+	go producer(ch)
+	go readChan(ch) // 不及时读取就会堵塞
 
-	//ch := make(chan string, 3)
-	//go producer(ch)
-	//go readChan(ch) // 不及时读取就会堵塞
-
-	ch := make(chan int, 3)
-	go sendOnly(ch)
-	//go receiveOnly(ch)
-
-	timeout := time.After(2 * time.Second)
-	for {
-		select {
-		case v, ok := <-ch:
-			if !ok { // 通道是什么类型，关闭后ok就是什么类型的零值
-				fmt.Println("Channel已经关闭")
-				return
-			}
-			fmt.Printf("主goroutine接收到：%d\n", v)
-			time.Sleep(500 * time.Millisecond)
-		case <-timeout:
-			fmt.Println("操作超时")
-			return
-		default:
-			fmt.Println("没有数据，等待中...")
-			time.Sleep(100 * time.Millisecond)
-		}
-	}
+	//time.Sleep(1 * time.Second)
+	fmt.Println("END")
 }
 
 func learnOperator() {
@@ -1143,4 +1108,41 @@ func main() {
 	fmt.Println("---------------------learnPacking----------------------")
 	// 文件后带darwin，linux，windows关键字会被自动条件编译
 	fmt.Println(packing.TAG)
+
+	fmt.Println("---------------------task 2----------------------")
+	var arr = []int{1, 2, 3, 4, 5}
+	task.Task2_2(&arr)
+	fmt.Println(arr)
+
+	task.Task2_3()
+
+	funcs := []func(){f1, f2}
+	task.Task2_4(funcs)
+
+	var rectangle = &task.Rectangle{10, 20}
+	var circle = &task.Circle{10}
+	perimeter1, area1 := task.Task2_5(circle)
+	perimeter2, area2 := task.Task2_5(rectangle)
+	fmt.Println("circle Perimeter: ", perimeter1)
+	fmt.Println("circle Area: ", area1)
+	fmt.Println("rectangle Perimeter: ", perimeter2)
+	fmt.Println("rectangle Area: ", area2)
+
+	task.Task2_6()
+
+	task.Task2_7()
+
+	task.Task2_8()
+
+	task.Task2_9()
+
+	task.Task2_10()
+}
+
+func f1() {
+	time.Sleep(time.Millisecond * 100)
+}
+func f2() {
+	for i := 0; i < 500000; i++ {
+	}
 }
