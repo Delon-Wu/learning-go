@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/Delon-Wu/learning-go.git/task"
 )
 
 const str1 = "Hello World1"
@@ -923,4 +925,41 @@ func main() {
 	learnRange()
 	fmt.Println("---------------------learnTypeChanging----------------------")
 	learnTypeChanging()
+
+	fmt.Println("---------------------task 2----------------------")
+	var arr = []int{1, 2, 3, 4, 5}
+	task.Task2_2(&arr)
+	fmt.Println(arr)
+
+	task.Task2_3()
+
+	funcs := []func(){f1, f2}
+	task.Task2_4(funcs)
+
+	var rectangle = &task.Rectangle{10, 20}
+	var circle = &task.Circle{10}
+	perimeter1, area1 := task.Task2_5(circle)
+	perimeter2, area2 := task.Task2_5(rectangle)
+	fmt.Println("circle Perimeter: ", perimeter1)
+	fmt.Println("circle Area: ", area1)
+	fmt.Println("rectangle Perimeter: ", perimeter2)
+	fmt.Println("rectangle Area: ", area2)
+
+	task.Task2_6()
+
+	task.Task2_7()
+
+	task.Task2_8()
+
+	task.Task2_9()
+
+	task.Task2_10()
+}
+
+func f1() {
+	time.Sleep(time.Millisecond * 100)
+}
+func f2() {
+	for i := 0; i < 500000; i++ {
+	}
 }
