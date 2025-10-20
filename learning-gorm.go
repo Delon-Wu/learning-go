@@ -167,6 +167,35 @@ func Run2(db *gorm.DB) {
 	db.Debug().Select("Emails", "Language", "Company").Delete(&User{ID: 6})
 }
 
+type Dog struct {
+	gorm.Model
+	Name string `gorm:"size:255"`
+	Toy  Toy    `gorm:"polymorphic:Owner;polymorphicType:OwnerType"` // 这俩的名称可以自定义
+}
+
+type Cat struct {
+	gorm.Model
+	Name string `gorm:"size:255"`
+	Toy  Toy    `gorm:"polymorphic:Owner;polymorphicType:OwnerType"`
+}
+
+type Toy struct {
+	gorm.Model
+	Name      string `gorm:"size:255"`
+	OwnerType string // 默认取表的名如：dogs, cats
+	OwnerID   uint
+}
+
+func Run3(db *gorm.DB) {
+	db.AutoMigrate(&Dog{}, &Cat{}, &Toy{})
+
+	// 多态
+	dog := Dog{Name: "Wangcai", Toy: Toy{Name: "Gutou"}}
+	cat := Cat{Name: "Mimi", Toy: Toy{Name: "Doumaubang"}}
+	db.Create(&dog)
+	db.Create(&cat)
+}
+
 func main() {
 	//db, err := gorm.Open(mysql.Open("root:st123456@tcp（这是用户名，密码）(127.0.0.1:3306)/gorm(这是数据库名)?charset=utf8（这是编码格式）&parseTime=True（将golang的time转成数据库支持的）&loc=Local"), &gorm.Config{})
 	db, err := gorm.Open(mysql.Open("root:123456@tcp(127.0.0.1:3306)/gorm?charset=utf8&parseTime=True&loc=Local"), &gorm.Config{})
@@ -176,5 +205,6 @@ func main() {
 	}
 
 	//Run1(db)
-	Run2(db)
+	//Run2(db)
+	Run3(db)
 }
