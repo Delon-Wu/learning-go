@@ -33,6 +33,13 @@ type User struct {
 	Company     Company `gorm:"foreignKey:CompanyID;references: Code"`
 	CreditCard1 CreditCard1
 	Language    []Language `gorm:"many2many:user_languages;"`
+	Emails      []Email    `gorm:"foreignKey:UserID;references: ID;"`
+}
+
+type Email struct {
+	gorm.Model
+	Email  string
+	UserID uint
 }
 
 type Company struct {
@@ -92,16 +99,17 @@ func Run2(db *gorm.DB) {
 	//db.AutoMigrate(&Company{})
 	//db.AutoMigrate(&CreditCard1{})
 	//db.AutoMigrate(&Language{})
+	//db.AutoMigrate(&Email{})
 	//
 	//now := time.Now()
 	//
-	//company := Company{Name: "Johnson", Code: 123888}
+	//company := Company{Name: "Johnson", Code: 111}
 	//result := db.Create(&company)
 	//if result.Error != nil {
 	//	fmt.Println(result.Error)
 	//}
 	//fmt.Println("Company ID:", company.ID)
-	//user := User{Name: "Demon Doe", Age: 90, Birthday: &now, CompanyID: 123888}
+	//user := User{Name: "Joey", Age: 90, Birthday: &now, CompanyID: 111}
 	//db.Create(&user)
 
 	//user := User{}
@@ -119,11 +127,44 @@ func Run2(db *gorm.DB) {
 
 	//languages := []*Language{{Name: "English"}, {Name: "Chinese"}, {Name: "French"}}
 	//db.Create(languages)
-	var languages []Language
-	db.Find(&languages)
-	fmt.Println("All languages: ", languages)
-	user := User{Name: "Old John", Age: 199, Language: languages, CompanyID: 123888}
-	db.Create(&user)
+
+	//var languages []Language
+	//db.Find(&languages)
+	//fmt.Println("All languages: ", languages)
+	//user := User{Name: "Old John", Age: 199, Language: languages, CompanyID: 111}
+	//db.Create(&user)
+
+	//user := User{
+	//	Name: "Phebe",
+	//	Age:  18,
+	//	Language: []Language{
+	//		{Name: "English"},
+	//		{Name: "Chinese"},
+	//		{Name: "Cantonese"},
+	//	},
+	//	CompanyID: 111,
+	//}
+	//db.Create(&user)
+	//db.Save(&user)
+
+	//var languages []Language
+	//db.Model(&User{ID: 1}).Association("Language").Find(&languages)
+	//fmt.Println(languages)
+
+	//var emails []Email
+	//db.Model(&User{ID: 3}).Association("Emails").Find(&emails)
+	//fmt.Println("Joey's emails: ", emails)
+	//db.Debug().Model(&User{ID: 3}).Association("Emails").Replace(&Email{Email: "111@qq.com", UserID: 3}, &Email{Email: "222@qq.com", UserID: 3})
+
+	//var langZh, langCan Language
+	//db.First(&langZh, "name = ?", "Chinese")
+	//db.First(&langCan, "name = ?", "Cantonese")
+	//db.Debug().Model(&User{ID: 3}).Association("Language").Delete(&langZh)
+	//db.Debug().Model(&User{ID: 3}).Association("Language").Append(&Language{Name: "Japanese"})
+	//db.Debug().Model(&User{ID: 6}).Association("Language").Clear()
+
+	//db.Debug().Model(&User{ID: 6}).Association("Language").Append(&Language{Name: "Japanese"}, &Language{Name: "English"}, &Language{Name: "Cantonese"})
+	db.Debug().Select("Emails", "Language", "Company").Delete(&User{ID: 6})
 }
 
 func main() {
