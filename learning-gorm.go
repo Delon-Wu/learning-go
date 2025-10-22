@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
 	"gorm.io/driver/mysql"
@@ -31,11 +32,11 @@ type User struct {
 	ShippingAddressID uint
 	ShippingAddress   Address    `gorm:"foreignkey:ShippingAddressID"`
 	Languages         []Language `gorm:"many2many:user_languages;"`
-	CompanyID   uint    // 要和Code的数据类型保持一致
-	Company     Company `gorm:"foreignKey:CompanyID;references: Code"`
-	CreditCard1 CreditCard1
-	Language    []Language `gorm:"many2many:user_languages;"`
-	Emails      []Email    `gorm:"foreignKey:UserID;references: ID;"`
+	CompanyID         uint       // 要和Code的数据类型保持一致
+	Company           Company    `gorm:"foreignKey:CompanyID;references: Code"`
+	CreditCard1       CreditCard1
+	Language          []Language `gorm:"many2many:user_languages;"`
+	Emails            []Email    `gorm:"foreignKey:UserID;references: ID;"`
 }
 
 type Address struct {
@@ -55,11 +56,6 @@ type Email struct {
 	Email  string
 	UserID uint
 }
-type Email struct {
-	gorm.Model
-	Email  string
-	UserID uint
-}
 
 type Company struct {
 	gorm.Model
@@ -73,10 +69,6 @@ type CreditCard1 struct {
 	UserID uint
 }
 
-type Language struct {
-	gorm.Model
-	Name string `gorm:"size:255"`
-}
 type Member struct {
 	gorm.Model
 	Name string `gorm:"size:255"`
@@ -118,6 +110,29 @@ func Run2(db *gorm.DB) {
 	//db.AutoMigrate(&CreditCard1{})
 	//db.AutoMigrate(&Language{})
 	//db.AutoMigrate(&Email{})
+
+	// CURD
+	//user := User{
+	//	Name: "Delon",
+	//	Age:  18,
+	//}
+	//result := db.Create(&user)
+	//if result.Error != nil {
+	//	fmt.Println("Error creating user", result.Error)
+	//}
+	//fmt.Println("Single user created", user)
+	//
+	//users := []*User{
+	//	{Name: "Tom", Age: 9},
+	//	{Name: "Jack", Age: 17},
+	//	{Name: "Janice", Age: 59},
+	//}
+	//result = db.Create(&users)
+	//if result.Error != nil {
+	//	fmt.Println("Error creating users", result.Error)
+	//}
+	//fmt.Println("Users created", result)
+
 	//
 	//now := time.Now()
 	//
@@ -205,44 +220,11 @@ type Toy struct {
 }
 
 func Run3(db *gorm.DB) {
-	db.AutoMigrate(&Dog{}, &Cat{}, &Toy{})
-
-	// 多态
-	dog := Dog{Name: "Wangcai", Toy: Toy{Name: "Gutou"}}
-	cat := Cat{Name: "Mimi", Toy: Toy{Name: "Doumaubang"}}
-	db.Create(&dog)
-	db.Create(&cat)
-}
-
-func Run2(db *gorm.DB) {
-	// CURD
-	user := User{
-		Name: "Delon",
-		Age:  18,
-	}
-	result := db.Create(&user)
-	if result.Error != nil {
-		fmt.Println("Error creating user", result.Error)
-	}
-	fmt.Println("Single user created", user)
-
-	users := []*User{
-		{Name: "Tom", Age: 9},
-		{Name: "Jack", Age: 17},
-		{Name: "Janice", Age: 59},
-	}
-	result = db.Create(&users)
-	if result.Error != nil {
-		fmt.Println("Error creating users", result.Error)
-	}
-	fmt.Println("Users created", result)
-}
-
-func Run3(db *gorm.DB) {
 	//db.AutoMigrate(&User{})
 	//db.AutoMigrate(&Address{})
 	//db.AutoMigrate(&Language{})
 	//db.AutoMigrate(&Email{})
+	db.AutoMigrate(&Dog{}, &Cat{}, &Toy{})
 	//user := User{
 	//	Name:            "Chandler",
 	//	Age:             25,
@@ -280,7 +262,7 @@ func Run3(db *gorm.DB) {
 	//	db.Select(clause.Associations).Delete(&u)
 	//}
 
-	var user User
+	//var user User
 	////error := db.Model(&user).Association("Languages").Error
 	//var languages []Language
 	//err := db.Model(&user).Association("Languages").Find(&languages)
@@ -289,8 +271,14 @@ func Run3(db *gorm.DB) {
 	//}
 	//fmt.Println("Languages:\n", languages)
 
-	ids := []uint{0, 1, 2}
-	db.Model(&user).Where("ID IN ?", ids).Association("Languages").Clear()
+	//ids := []uint{0, 1, 2}
+	//db.Model(&user).Where("ID IN ?", ids).Association("Languages").Clear()
+
+	// 多态
+	dog := Dog{Name: "Wangcai", Toy: Toy{Name: "Gutou"}}
+	cat := Cat{Name: "Mimi", Toy: Toy{Name: "Doumaubang"}}
+	db.Create(&dog)
+	db.Create(&cat)
 }
 
 func main() {
