@@ -2,10 +2,9 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"time"
 
-	"gorm.io/driver/mysql"
+	"github.com/Delon-Wu/learning-go.git/task"
 	"gorm.io/gorm"
 )
 
@@ -163,7 +162,6 @@ func Run2(db *gorm.DB) {
 
 	//var languages []Language
 	//db.Find(&languages)
-	//fmt.Println("All languages: ", languages)
 	//user := User{Name: "Old John", Age: 199, Language: languages, CompanyID: 111}
 	//db.Create(&user)
 
@@ -282,14 +280,15 @@ func Run3(db *gorm.DB) {
 }
 
 func main() {
-	//db, err := gorm.Open(mysql.Open("root:st123456@tcp（这是用户名，密码）(127.0.0.1:3306)/gorm(这是数据库名)?charset=utf8（这是编码格式）&parseTime=True（将golang的time转成数据库支持的）&loc=Local"), &gorm.Config{})
-	db, err := gorm.Open(mysql.Open("root:123456@tcp(127.0.0.1:3306)/gorm?charset=utf8&parseTime=True&loc=Local"), &gorm.Config{})
-	if err != nil {
-		fmt.Println(err)
-		panic("failed to connect database")
-	}
+	task.RunTask3()
+	////db, err := gorm.Open(mysql.Open("root:st123456@tcp（这是用户名，密码）(127.0.0.1:3306)/gorm(这是数据库名)?charset=utf8（这是编码格式）&parseTime=True（将golang的time转成数据库支持的）&loc=Local"), &gorm.Config{})
+	//db, err := gorm.Open(mysql.Open("root:123456@tcp(127.0.0.1:3306)/gorm?charset=utf8&parseTime=True&loc=Local"), &gorm.Config{})
+	//if err != nil {
+	//	fmt.Println(err)
+	//	panic("failed to connect database")
+	//}
 
 	//Run1(db)
 	//Run2(db)
-	Run3(db)
+	//Run3(db)
 }

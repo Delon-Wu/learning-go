@@ -7,6 +7,8 @@ require (
 	gorm.io/gorm v1.31.0
 )
 
+require github.com/jmoiron/sqlx v1.4.0 // indirect
+
 //# 下载所有依赖
 //go mod download
 //
