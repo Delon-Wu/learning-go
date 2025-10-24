@@ -224,18 +224,21 @@ func task3_2_2(db *sqlx.DB) {
 
 type User struct {
 	gorm.Model
-	Name     string
-	Posts    []Post    // 一对多：一个用户有多个文章
-	Comments []Comment // 一对多：一个用户有多个评论
+	Name       string
+	Posts      []Post    // 一对多：一个用户有多个文章
+	Comments   []Comment // 一对多：一个用户有多个评论
+	PostsCount int64     `gorm:"default:0"` // 文章数量统计
 }
 
 type Post struct {
 	gorm.Model
-	Title    string
-	Content  string
-	UserID   uint      // 外键字段
-	User     User      // 关联用户
-	Comments []Comment // 一对多：一篇文章有多个评论
+	Title         string
+	Content       string
+	UserID        uint      // 外键字段
+	User          User      // 关联用户
+	Comments      []Comment // 一对多：一篇文章有多个评论
+	CommentsCount int64     `gorm:"default:0"` // 评论数量统计
+	CommentStatus string    `gorm:"default:'无评论'"`
 }
 
 type Comment struct {
@@ -245,6 +248,41 @@ type Comment struct {
 	User    User // 关联用户
 	PostID  uint // 外键字段
 	Post    Post // 关联文章
+}
+
+func (p *Post) AfterCreate(tx *gorm.DB) error {
+	// 如果没有关联用户 ID，则不处理
+	if p.UserID == 0 {
+		return nil
+	}
+	// 原子地递增 users.posts_count，使用 UpdateColumn + gorm.Expr 防止触发其他钩子或回调
+	return tx.Model(&User{}).
+		Where("id = ?", p.UserID).
+		UpdateColumn("posts_count", gorm.Expr("COALESCE(posts_count,0) + ?", 1)).Error
+}
+
+func (c *Comment) AfterCreate(tx *gorm.DB) error {
+	if c.PostID == 0 {
+		return nil
+	}
+	// 原子地 +1 并更新状态为 "N 条评论"
+	return tx.Model(&Post{}).Where("id = ?", c.PostID).
+		UpdateColumns(map[string]interface{}{
+			"comments_count": gorm.Expr("COALESCE(comments_count,0) + ?", 1),
+			"comment_status": gorm.Expr("CONCAT(COALESCE(comments_count,0) + ?, ' 条评论')", 1),
+		}).Error
+}
+
+func (c *Comment) AfterDelete(tx *gorm.DB) error {
+	if c.PostID == 0 {
+		return nil
+	}
+	// 原子地 -1（不低于0）并更新状态为 "无评论" 或 "N 条评论"
+	return tx.Model(&Post{}).Where("id = ?", c.PostID).
+		UpdateColumns(map[string]interface{}{
+			"comments_count": gorm.Expr("GREATEST(COALESCE(comments_count,0) - ?, 0)", 1),
+			"comment_status": gorm.Expr("CASE WHEN GREATEST(COALESCE(comments_count,0) - ?, 0) = 0 THEN '无评论' ELSE CONCAT(GREATEST(COALESCE(comments_count,0) - ?, 0), ' 条评论') END", 1, 1),
+		}).Error
 }
 
 func task3_3_2(db *gorm.DB) {
@@ -296,6 +334,35 @@ func task3_3_2(db *gorm.DB) {
 
 }
 
+func task3_3_3(db *gorm.DB) {
+	db.AutoMigrate(&Post{}, &Comment{}, &User{})
+	var tom User
+	var posts []Post
+	db.Where("name = ?", "Tom").First(&tom)
+	//posts = []Post{
+	//	{Title: "怎么吃饭2", Content: "饭是这样吃的2", UserID: tom.ID},
+	//	//{Title: "钢铁是怎么养成的", Content: "饭是这样吃的", UserID: jerry.ID},
+	//}
+	//if err := db.Create(&posts).Error; err != nil {
+	//	fmt.Println("创建 posts 失败:", err)
+	//}
+	//
+	//// 重新查询用户以显示 PostsCount（钩子会在创建时递增）
+	//db.First(&tom, tom.ID)
+	//fmt.Printf("Tom PostsCount=%d,", tom.PostsCount)
+
+	//var comment Comment
+	//comment.UserID = tom.ID
+	//comment.PostID = 2
+	//db.Create(&comment
+	var comments []Comment
+	db.Model(&Comment{}).Where("post_id = ? AND user_id = ?", 2, tom.ID).Find(&comments)
+	db.Preload("Comments").Delete(&comments)
+
+	db.Find(&posts, 2)
+	fmt.Println("Post: ", posts)
+}
+
 func RunTask3() {
 	db, err := gorm.Open(mysql.Open("root:123456@tcp(127.0.0.1:3306)/gorm?charset=utf8&parseTime=True&loc=Local"), &gorm.Config{})
 	if err != nil {
@@ -313,5 +380,6 @@ func RunTask3() {
 	//task3_2_1(db)
 	//task3_2_2(db)
 
-	task3_3_2(db)
+	//task3_3_2(db)
+	task3_3_3(db)
 }
